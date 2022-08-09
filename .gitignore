@@ -10,3 +10,9 @@ __pycache__/
 
 # migrations
 nba_app/migrations
+
+# script
+csv_to_db.py
+
+# dirver
+chromedriver.exe
