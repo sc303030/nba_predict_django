@@ -1,8 +1,8 @@
 from urllib.request import urlopen
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
-from urllib.error   import HTTPError
-from urllib.error   import URLError
+from urllib.error import HTTPError
+from urllib.error import URLError
 
 import pandas as pd
 
@@ -15,15 +15,18 @@ options = webdriver.ChromeOptions()
 service = ChromeService(executable_path='./chromedriver.exe')
 driver = webdriver.Chrome(service=service, options=options)
 
-def craw(start,end):
-    page_list = [ i for i in range(start,end,25)]
+
+def craw(start, end):
+    page_list = [i for i in range(start, end, 25)]
     Date = []
     Team = []
     Acquired = []
     Relinquished = []
     Notes = []
     for page in page_list:
-        driver.get('http://www.prosportstransactions.com/basketball/Search/SearchResults.php?Player=&Team=&BeginDate=1998-01-01&EndDate=2020-12-31&ILChkBx=yes&Submit=Search&start='+str(page))
+        driver.get(
+            'http://www.prosportstransactions.com/basketball/Search/SearchResults.php?Player=&Team=&BeginDate=1998-01-01&EndDate=2020-12-31&ILChkBx=yes&Submit=Search&start=' + str(
+                page))
         page = driver.find_elements(By.CSS_SELECTOR, '.datatable')
         if len(page) != 0:
             for i in page[0].find_elements(By.TAG_NAME, 'tbody'):
@@ -35,83 +38,60 @@ def craw(start,end):
                     Acquired.append(ll[2].text)
                     Relinquished.append(ll[3].text)
                     Notes.append(ll[4].text)
-    return   Date,Team, Acquired,Relinquished, Notes
-
-Date,Team, Acquired,Relinquished, Notes = craw(0,5001)
-Date1,Team1, Acquired1,Relinquished1, Notes1 = craw(5001,10001)
-Date2,Team2, Acquired2,Relinquished2, Notes2 = craw(10001,15001)
-Date3,Team3, Acquired3,Relinquished3, Notes3 = craw(15000,20001)
-Date4,Team4, Acquired4,Relinquished4, Notes4 = craw(20001,25001)
-Date5,Team5, Acquired5,Relinquished5, Notes5 = craw(25001,28526)
+    return Date, Team, Acquired, Relinquished, Notes
 
 
-df1 = pd.DataFrame({
-    'Date':Date,
-    'Team' : Team,
-    'Acquired' : Acquired,
-    'Relinquished' : Relinquished,
-    'Notes' : Notes
-                   })
+Date, Team, Acquired, Relinquished, Notes = craw(0, 5001)
+Date1, Team1, Acquired1, Relinquished1, Notes1 = craw(5001, 10001)
+Date2, Team2, Acquired2, Relinquished2, Notes2 = craw(10001, 15001)
+Date3, Team3, Acquired3, Relinquished3, Notes3 = craw(15000, 20001)
+Date4, Team4, Acquired4, Relinquished4, Notes4 = craw(20001, 25001)
+Date5, Team5, Acquired5, Relinquished5, Notes5 = craw(25001, 28526)
 
-df2 = pd.DataFrame({
-    'Date':Date1,
-    'Team' : Team1,
-    'Acquired' : Acquired1,
-    'Relinquished' : Relinquished1,
-    'Notes' : Notes1
-                   })
+data_collection = [[Date, Team, Acquired, Relinquished, Notes],
+             [Date1, Team1, Acquired1, Relinquished1, Notes1],
+             [Date2, Team2, Acquired2, Relinquished2, Notes2],
+             [Date3, Team3, Acquired3, Relinquished3, Notes3],
+             [Date4, Team4, Acquired4, Relinquished4, Notes4],
+             [Date5, Team5, Acquired5, Relinquished5, Notes5]]
 
-df3 = pd.DataFrame({
-    'Date':Date2,
-    'Team' : Team2,
-    'Acquired' : Acquired2,
-    'Relinquished' : Relinquished2,
-    'Notes' : Notes2
-                   })
 
-df4 = pd.DataFrame({
-    'Date':Date3,
-    'Team' : Team3,
-    'Acquired' : Acquired3,
-    'Relinquished' : Relinquished3,
-    'Notes' : Notes3
-                   })
+def create_dataframe(date, team, acquired, relinquished, notes):
+    df = pd.DataFrame({
+        'Date': date,
+        'Team': team,
+        'Acquired': acquired,
+        'Relinquished': relinquished,
+        'Notes': notes
+    })
+    return df
 
-df5 = pd.DataFrame({
-    'Date':Date4,
-    'Team' : Team4,
-    'Acquired' : Acquired4,
-    'Relinquished' : Relinquished4,
-    'Notes' : Notes4
-                   })
+data_df = {}
 
-df6 = pd.DataFrame({
-    'Date':Date5,
-    'Team' : Team5,
-    'Acquired' : Acquired5,
-    'Relinquished' : Relinquished5,
-    'Notes' : Notes5
-                   })
+for idx, datas in enumerate(data_collection):
+    date, team, acquired, relinquished, notes = datas
+    data_df[f"df{idx}"] = create_dataframe(Date, Team, Acquired, Relinquished, Notes)
 
-nba_injury_1998 = pd.concat([df1,df2,df3,df4,df5,df6])
-drop_index = list(nba_injury_1998[nba_injury_1998['Date']==' Date'].index)
+
+nba_injury_1998 = pd.concat([*data_df.values()])
+drop_index = list(nba_injury_1998[nba_injury_1998['Date'] == ' Date'].index)
 nba_injury_1998 = nba_injury_1998.drop(drop_index).reset_index(drop=True)
-none_Relinquished = list(nba_injury_1998[nba_injury_1998['Relinquished'] ==''].index)
+none_Relinquished = list(nba_injury_1998[nba_injury_1998['Relinquished'] == ''].index)
 nba_injury_1998 = nba_injury_1998.drop(none_Relinquished).reset_index(drop=True)
-nba_injury_1998 = nba_injury_1998.drop(['Acquired'],axis=1)
-nba_injury_1998.to_csv('nba_injury_1998.csv',mode='w',index=False)
+nba_injury_1998 = nba_injury_1998.drop(['Acquired'], axis=1)
+nba_injury_1998.to_csv('nba_injury_1998.csv', mode='w', index=False)
 
 for i in range(nba_injury_1998.shape[0]):
-    if nba_injury_1998.loc[i,'Relinquished'] != '':
-        nba_injury_1998.loc[i,'Relinquished'] = nba_injury_1998.loc[i,'Relinquished'].split('•')[1].strip()
-        nba_injury_1998.loc[i,'Date'] = nba_injury_1998.loc[i,'Date'].strip()
-        nba_injury_1998.loc[i,'Team'] = nba_injury_1998.loc[i,'Team'].strip()
-        nba_injury_1998.loc[i,'Notes'] = nba_injury_1998.loc[i,'Notes'].strip()
-    if nba_injury_1998.loc[i,'Relinquished'] =='':
-        nba_injury_1998.loc[i,'Relinquished'] = nba_injury_1998.loc[i,'Relinquished']
-        nba_injury_1998.loc[i,'Date'] = nba_injury_1998.loc[i,'Date'].strip()
-        nba_injury_1998.loc[i,'Team'] = nba_injury_1998.loc[i,'Team'].strip()
-        nba_injury_1998.loc[i,'Notes'] = nba_injury_1998.loc[i,'Notes'].strip()
+    if nba_injury_1998.loc[i, 'Relinquished'] != '':
+        nba_injury_1998.loc[i, 'Relinquished'] = nba_injury_1998.loc[i, 'Relinquished'].split('•')[1].strip()
+        nba_injury_1998.loc[i, 'Date'] = nba_injury_1998.loc[i, 'Date'].strip()
+        nba_injury_1998.loc[i, 'Team'] = nba_injury_1998.loc[i, 'Team'].strip()
+        nba_injury_1998.loc[i, 'Notes'] = nba_injury_1998.loc[i, 'Notes'].strip()
+    if nba_injury_1998.loc[i, 'Relinquished'] == '':
+        nba_injury_1998.loc[i, 'Relinquished'] = nba_injury_1998.loc[i, 'Relinquished']
+        nba_injury_1998.loc[i, 'Date'] = nba_injury_1998.loc[i, 'Date'].strip()
+        nba_injury_1998.loc[i, 'Team'] = nba_injury_1998.loc[i, 'Team'].strip()
+        nba_injury_1998.loc[i, 'Notes'] = nba_injury_1998.loc[i, 'Notes'].strip()
 
 for i in range(nba_injury_1998.shape[0]):
     data = nba_injury_1998.loc[i, 'Notes'].split('with')
@@ -120,4 +100,4 @@ for i in range(nba_injury_1998.shape[0]):
     else:
         nba_injury_1998.loc[i, 'Notes2'] = nba_injury_1998.loc[i, 'Notes']
 
-nba_injury_1998.to_csv('nba_injury_1998.csv',mode='w',index=False)
+nba_injury_1998.to_csv('nba_injury_1998.csv', mode='w', index=False)
