@@ -1,14 +1,7 @@
-from urllib.request import urlopen
-from bs4 import BeautifulSoup
-from urllib.request import urlopen
-from urllib.error import HTTPError
-from urllib.error import URLError
-
 import pandas as pd
 
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-import time
 from selenium.webdriver.common.by import By
 
 options = webdriver.ChromeOptions()
@@ -49,11 +42,11 @@ Date4, Team4, Acquired4, Relinquished4, Notes4 = craw(20001, 25001)
 Date5, Team5, Acquired5, Relinquished5, Notes5 = craw(25001, 28526)
 
 data_collection = [[Date, Team, Acquired, Relinquished, Notes],
-             [Date1, Team1, Acquired1, Relinquished1, Notes1],
-             [Date2, Team2, Acquired2, Relinquished2, Notes2],
-             [Date3, Team3, Acquired3, Relinquished3, Notes3],
-             [Date4, Team4, Acquired4, Relinquished4, Notes4],
-             [Date5, Team5, Acquired5, Relinquished5, Notes5]]
+                   [Date1, Team1, Acquired1, Relinquished1, Notes1],
+                   [Date2, Team2, Acquired2, Relinquished2, Notes2],
+                   [Date3, Team3, Acquired3, Relinquished3, Notes3],
+                   [Date4, Team4, Acquired4, Relinquished4, Notes4],
+                   [Date5, Team5, Acquired5, Relinquished5, Notes5]]
 
 
 def create_dataframe(date, team, acquired, relinquished, notes):
@@ -66,12 +59,12 @@ def create_dataframe(date, team, acquired, relinquished, notes):
     })
     return df
 
+
 data_df = {}
 
 for idx, datas in enumerate(data_collection):
     date, team, acquired, relinquished, notes = datas
     data_df[f"df{idx}"] = create_dataframe(Date, Team, Acquired, Relinquished, Notes)
-
 
 nba_injury_1998 = pd.concat([*data_df.values()])
 drop_index = list(nba_injury_1998[nba_injury_1998['Date'] == ' Date'].index)
