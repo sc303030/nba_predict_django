@@ -5,7 +5,7 @@ from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 
 options = webdriver.ChromeOptions()
-service = ChromeService(executable_path='./chromedriver.exe')
+service = ChromeService(executable_path='chromedriver.exe')
 driver = webdriver.Chrome(service=service, options=options)
 
 
@@ -93,4 +93,4 @@ for i in range(nba_injury_1998.shape[0]):
     else:
         nba_injury_1998.loc[i, 'Notes2'] = nba_injury_1998.loc[i, 'Notes']
 
-nba_injury_1998.to_csv('nba_injury_1998.csv', mode='w', index=False)
+nba_injury_1998.to_csv('crawling/nba_injury_1998.csv', mode='w', index=False)

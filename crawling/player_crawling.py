@@ -1,19 +1,10 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service as ChromeService
-
-import os
-
-os.environ['DJANGO_SETTINGS_MODULE'] = 'nba_predict_django.settings'
-import django
-
-django.setup()
-from nba_app.models import Player
-
-from dataclasses import dataclass
 from selenium.webdriver.common.by import By
+import pandas as pd
 
 options = webdriver.ChromeOptions()
-service = ChromeService(executable_path='./chromedriver.exe')
+service = ChromeService(executable_path='crawling/chromedriver.exe')
 driver = webdriver.Chrome(service=service, options=options)
 
 
@@ -28,7 +19,6 @@ def craw():
     for day in time_list:
         driver.get('https://en.wikipedia.org/wiki/List_of_' + str(day) + '_NBA_season_transactions')
         page = driver.find_elements(By.CSS_SELECTOR, '.wikitable')
-        print(page[0])
         page = page[0]
         for i in page.find_elements(By.TAG_NAME, 'tbody'):
             k = i.find_elements(By.TAG_NAME, 'tr')
@@ -46,27 +36,9 @@ def craw():
                         age_list.append(j.find_elements(By.TAG_NAME, 'td')[2].text)
                         year_list.append(day_list[cnt])
             cnt += 1
-            print(cnt)
     return name_list, age_list, year_list
 
 
 name_list, age_list, year_list = craw()
-
-
-@dataclass
-class PlayerIntoDb:
-    name_list: list
-    age_list: list
-    year_list: list
-
-    def into_db(self):
-        players = []
-        for name, age, year in zip(self.name_list, self.age_list, self.year_list):
-            players.append(Player(name=name, age=age, retire_year=year))
-        Player.objects.bulk_create(players)
-
-
-print('Player 시작')
-player_info_db = PlayerIntoDb(name_list, age_list, year_list)
-player_info_db.into_db()
-print('Player 종료')
+player_df = pd.DataFrame({'name': name_list, 'age': age_list, 'year': year_list})
+player_df.to_csv('crawling/player_info.csv', index=False)

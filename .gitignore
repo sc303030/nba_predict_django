@@ -12,7 +12,7 @@ __pycache__/
 nba_app/migrations
 
 # script
-csv_to_db.py
+csv_to_db_.py
 
 # dirver
-chromedriver.exe
+crawling/chromedriver.exe
