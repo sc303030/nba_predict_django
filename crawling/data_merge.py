@@ -54,7 +54,7 @@ def merge_retire_player_season(nba_retire, nba_player, nba_injury):
                  'Jose Calderon',
                  'Kevin Seraphin']
     cnt = 0
-    for i in range(155, 176):
+    for i in range(159, 180):
         nba_01.loc[i, 'name'] = name_list[cnt]
         cnt += 1
 
