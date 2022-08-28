@@ -26,6 +26,10 @@ class PlayerIntoDb:
 
 
 player_df = pd.read_csv('crawling/player_info.csv')
+injury_1998 = pd.read_csv("crawling/player_info.csv")
+merged_position = pd.read_csv("crawling/merged_position")
+injury_1998.drop(['Notes'], axis=1, inplace=True)
+df_injury_player_merge = pd.merge(injury_1998, merged_position, left_on="Relinquished", right_on="name", how='right')
 print('Player 시작')
 player_info_db = PlayerIntoDb(player_df)
 player_info_db.into_db()
