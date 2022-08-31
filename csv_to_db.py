@@ -10,11 +10,16 @@ from dataclasses import dataclass
 import pandas as pd
 
 
-@dataclass
+@dataclass(init=True)
 class PlayerIntoDb:
     player_df: pd.DataFrame
     merged_df: pd.DataFrame
     injury_df: pd.DataFrame
+    merge_df : pd.DataFrame = pd.DataFrame({})
+
+    def __init__(self):
+        injury_df_drop_notes = self.injury_df.drop('Notes', axis=1)
+        self.merge_df = pd.merge(injury_df_drop_notes, self.player_df, left_on="Relinquished", right_on="name")
 
     def csv_to_list(self, df, columns):
         _data = {i: df[i].values for i in columns}
@@ -35,7 +40,7 @@ class PlayerIntoDb:
         Injury.objects.bulk_create(injury_list)
 
     def player_into_db(self):
-        name_list, age_list, year_list = self.csv_to_list()
+        player_list = self.csv_to_list(merge_df, ['Date', 'Team', 'name', 'Notes2'])
         players = []
         for name, age, year in zip(name_list, age_list, year_list):
             players.append(Player(name=name, age=age, retire_year=year))
