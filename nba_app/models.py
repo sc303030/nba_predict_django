@@ -5,13 +5,17 @@ from model_utils.models import TimeStampedModel
 class Player(TimeStampedModel):
     POSITION_CHOICES = [
         ('G', 'guard'),
+        ('G-F', 'guard-forward'),
         ('F', 'forward'),
-        ('C', 'center')
+        ('F-G', 'forward-guard'),
+        ('F-C', 'forward-center'),
+        ('C', 'center'),
+        ('C-F', 'center-forward')
     ]
     name = models.CharField(max_length=100)
     age = models.IntegerField()
     uniform_number = models.IntegerField(null=True)
-    position = models.CharField(max_length=1, choices=POSITION_CHOICES, null=True)
+    position = models.CharField(max_length=3, choices=POSITION_CHOICES, null=True)
     retire_year = models.IntegerField()
     season = models.IntegerField()
     injury_count = models.IntegerField()
