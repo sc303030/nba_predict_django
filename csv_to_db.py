@@ -32,19 +32,15 @@ class PlayerIntoDb:
         _data = [df[i].values for i in columns]
         return _data
 
-    def merge_position(self):
-        df_injury_player_merge = pd.merge(self.player_df, self.merged_df, left_on="Relinquished", right_on="name",
-                                          how='right')
-        print(df_injury_player_merge)
-
     def injury_info_db(self):
         injury_df_drop_notes = self.injury_df.drop('Notes', axis=1)
-        merge_df = pd.merge(injury_df_drop_notes, self.player_df, left_on="Relinquished", right_on="name")
+        merge_df = pd.merge(injury_df_drop_notes, self.player_position_df, left_on="Relinquished", right_on="name",
+                            how='right')
         injury_to_list = self.csv_to_list(merge_df, ['Date', 'Team', 'name', 'Notes2'])
         injury_list = []
-        for date, team, name, injury_details in zip(injury_to_list['Date'], injury_to_list['Team'],
-                                                    injury_to_list['name'], injury_to_list['Notes2']):
-            injury_list.append(Injury(date=date, team=team, name=name, injury_details=injury_details))
+        for date, team, name, injury_details in zip(*injury_to_list):
+            player_obj = Player.objects.filter(name__in=[name])
+            injury_list.append(Injury(date=date, team=team, name=player_obj[0], injury_details=injury_details))
         Injury.objects.bulk_create(injury_list)
 
     def player_into_db(self):
@@ -61,7 +57,6 @@ merged_df = pd.read_csv("crawling/nba_injury_merge_position.csv")
 injury_df = pd.read_csv("crawling/nba_injury_1998.csv")
 print('Player 시작')
 player_info_db = PlayerIntoDb(player_df, merged_df, injury_df)
-# player_info_db.injury_info_db()
-# player_info_db.merge_position()
 player_info_db.player_into_db()
+player_info_db.injury_info_db()
 print('Player 종료')

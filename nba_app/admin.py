@@ -12,6 +12,14 @@ class PlayerAdmin(admin.ModelAdmin):
         return f"{self.name}"
 
 
+@admin.register(Injury)
+class InjuryAdmin(admin.ModelAdmin):
+    list_display = ["name", "team"]
+    list_display_links = ["name"]
+
+    def __str__(self):
+        return f"{self.name}"
+
+
 admin.site.register(Predict)
 admin.site.register(Image)
-admin.site.register(Injury)
