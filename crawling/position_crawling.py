@@ -29,6 +29,9 @@ def crawling_position(position_dic):
         time.sleep(1)
         position_table = driver.find_elements(By.CSS_SELECTOR, '.players-list')[0]
         position_tr = position_table.find_elements(By.TAG_NAME, 'tr')[1]
+        player_image_td = position_tr.find_elements(By.TAG_NAME, 'td')[0]
+        player_image_url = player_image_td.find_elements(By.TAG_NAME, 'img')
+        print(player_image_url[0].get_attribute('src'))
         position_td = position_tr.find_elements(By.TAG_NAME, 'td')[3].text
         position_dic[names] = position_td
         key_words.clear()
@@ -50,7 +53,7 @@ def write_to_dir(nba_injury_merge, position_dic):
 def make_dataframe():
     nba_injury_merge, position_dic = get_injury_name_dict()
     position_dic = crawling_position(position_dic)
-    write_to_dir(nba_injury_merge, position_dic)
+    # write_to_dir(nba_injury_merge, position_dic)
 
 
 if __name__ == "__main__":
