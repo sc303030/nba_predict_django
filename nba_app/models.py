@@ -19,6 +19,10 @@ class Player(TimeStampedModel):
     retire_year = models.IntegerField()
     season = models.IntegerField()
     injury_count = models.IntegerField()
+    image = models.ImageField(upload_to="image/", default="")
+
+    def __str__(self):
+        return self.name
 
 
 class Injury(TimeStampedModel):

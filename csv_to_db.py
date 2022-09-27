@@ -8,6 +8,7 @@ from nba_app.models import Player, Injury
 
 from dataclasses import dataclass
 import pandas as pd
+from PIL import Image
 
 
 @dataclass(init=True)
@@ -47,8 +48,10 @@ class PlayerIntoDb:
         player_info_list = self.csv_to_list(self.player_position_df, self.player_position_df.columns)
         players = []
         for name, year, age, season, notes, position in zip(*player_info_list):
+            img = f"static/image/{name}.png"
             players.append(
-                Player(name=name, age=age, retire_year=year, season=season, injury_count=notes, position=position))
+                Player(name=name, age=age, retire_year=year, season=season, injury_count=notes, position=position,
+                       image=img))
         Player.objects.bulk_create(players)
 
 
@@ -60,3 +63,5 @@ player_info_db = PlayerIntoDb(player_df, merged_df, injury_df)
 player_info_db.player_into_db()
 player_info_db.injury_info_db()
 print('Player 종료')
+# file_list = os.listdir('nba_app/images')
+# print(file_list)
