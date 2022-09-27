@@ -16,3 +16,6 @@ csv_to_db_.py
 
 # dirver
 crawling/chromedriver.exe
+
+#static
+/static
